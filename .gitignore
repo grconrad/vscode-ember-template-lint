@@ -1,0 +1,11 @@
+# Vendored dependencies
+node_modules/
+
+# Local cache for VS Code binaries downloaded by test runner
+.vscode-test/
+
+# Build output
+out/
+
+# The built extension file
+*.vsix
