@@ -159,7 +159,11 @@ async function lintTemplate(
           lintErrors = jsonResult[targetRelativePath];
         } catch (parseErr) {
           console.error(parseErr);
-          console.log('execa error (stringified) shown below:');
+          console.log('execa error:');
+          console.log('-----');
+          console.log(execaErr);
+          console.log('-----');
+          console.log('execa error (stringified):');
           console.log('-----');
           console.log(JSON.stringify(execaErr, null, 2));
           console.log('-----');
