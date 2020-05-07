@@ -22,7 +22,7 @@ function sleep(ms: number): Promise<void> {
   });
 }
 
-suite("Extension Test Suite", () => {
+suite("Extension Test Suite", function () {
 
   before(function () {
     this.timeout(30 * 1000);

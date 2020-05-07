@@ -23,10 +23,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn install
-      - run: yarn lint
-      - run: yarn build
-      - name: Run tests
+      - name: Install dependencies
+        run: yarn install
+      - name: Static analysis
+        run: yarn lint
+      - name: Build
+        run: yarn build
+      - name: Run integration tests
         uses: GabrielBB/xvfb-action@v1.0
         with:
           run: yarn test
