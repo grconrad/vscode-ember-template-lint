@@ -132,13 +132,13 @@ async function lintTemplate(
       // This seems to indicate that there were no lint errors.
       // There's no need to do anything here; linterErrors is already [].
       // console.log(processResult);
-    } catch (error) {
+    } catch (etlErr) {
       // execa will throw whenever there are lint errors, because ember-template-lint exits
       // nonzero in that case. We can read the JSON result from the error object's stdout.
       // console.log(`error = ${error}`);
-      if (!error.timedOut) {
+      if (!etlErr.timedOut) {
         try {
-          const jsonResult = JSON.parse(error.stdout);
+          const jsonResult = JSON.parse(etlErr.stdout);
           // Result is like the following, with a list of errors keyed by file (relative path).
           //
           // {
@@ -157,9 +157,12 @@ async function lintTemplate(
           //
           // Fish out the errors.
           lintErrors = jsonResult[targetRelativePath];
-        } catch (e) {
-          console.log('Could not parse JSON in output from ember-template-lint', error);
-          console.error(e);
+        } catch (parseErr) {
+          console.error(parseErr);
+          console.log('Failed to JSON.parse the stdout from ember-template-lint (shown between dashes below):');
+          console.log('-----');
+          console.log(etlErr.stdout);
+          console.log('-----');
         }
       }
     }
