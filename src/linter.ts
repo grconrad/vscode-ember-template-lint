@@ -94,7 +94,6 @@ async function lintTemplate(
 
   const targetPath = document.uri.fsPath; // absolute path to hbs
   const targetDir = path.dirname(targetPath);
-  const targetFilename = path.basename(targetPath);
   // console.log(`Target file: ${targetFilename} in dir ${targetDir}`);
 
   // Find nearest .template-lintrc.js.
@@ -114,7 +113,7 @@ async function lintTemplate(
     const targetRelativePath = path.relative(configDir, targetPath);
 
     try {
-      const processResult = execa.sync(
+      await execa(
         `./node_modules/.bin/ember-template-lint`,
         [
           `--json`,
