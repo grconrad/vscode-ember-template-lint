@@ -26,7 +26,6 @@
     "build": "tsc -p ./",
     "clean": "rm -rf out",
     "lint": "eslint src --ext ts",
-    "pretest": "yarn build && yarn lint",
     "test": "node ./out/test/runTest.js",
     "vscode:prepublish": "yarn build",
     "vsix": "vsce package",
