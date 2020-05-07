@@ -1,8 +1,8 @@
 {
   "name": "vscode-ember-template-lint",
-  "displayName": "(Unofficial) Ember template lint for VS Code",
+  "displayName": "(Unofficial) Ember Template Lint",
   "version": "0.0.1",
-  "description": "See lint issues in Problems view while editing an hbs file",
+  "description": "Lint your templates as you edit them",
   "categories": [
     "Other"
   ],

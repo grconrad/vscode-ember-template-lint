@@ -23,6 +23,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 suite("Extension Test Suite", () => {
+
   before(() => {
     // In sample project with ember-template-lint configured, install dependencies.
     // The presence of ember-template-lint in that project is required in order for our extension to
@@ -72,6 +73,8 @@ suite("Extension Test Suite", () => {
   // Option 3: Look for a globally installed ember-template-lint, similar to documented behavior of
   // eslint extension (dbaeumer.vscode-eslint)
   test("hbs in project with no template lint configuration", async function() {
+    this.timeout(5 * 1000);
+
     const hbsDoc = await workspace.openTextDocument(
       path.join(FIXTURES_DIR, "project-missing-config", "foo", "any.hbs")
     );
@@ -85,6 +88,8 @@ suite("Extension Test Suite", () => {
   });
 
   test("Valid hbs in project with lint configured", async function() {
+    this.timeout(5 * 1000);
+
     const hbsDoc = await workspace.openTextDocument(
       path.join(FIXTURES_DIR, "sample-project", "foo", "good.hbs")
     );
@@ -98,6 +103,8 @@ suite("Extension Test Suite", () => {
   });
 
   test("Invalid hbs in project with lint configured", async function() {
+    this.timeout(5 * 1000);
+
     const hbsDoc = await workspace.openTextDocument(
       path.join(FIXTURES_DIR, "sample-project", "foo", "bad.hbs")
     );
