@@ -158,8 +158,8 @@ async function lintTemplate(
           // Fish out the errors.
           lintErrors = jsonResult[targetRelativePath];
         } catch (e) {
-          // console.log('Error, could not parse JSON');
-          console.log(e);
+          console.log('Could not parse JSON in output from ember-template-lint', error);
+          console.error(e);
         }
       }
     }
