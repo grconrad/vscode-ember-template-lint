@@ -95,13 +95,13 @@ async function lintTemplate(
   const targetPath = document.uri.fsPath; // absolute path to hbs
   const targetDir = path.dirname(targetPath);
   const targetFilename = path.basename(targetPath);
-  console.log(`Target file: ${targetFilename} in dir ${targetDir}`);
+  // console.log(`Target file: ${targetFilename} in dir ${targetDir}`);
 
   // Find nearest .template-lintrc.js.
   const configFile = findUp.sync('.template-lintrc.js', {
     cwd: targetDir
   });
-  console.log(`findUp resolved config file = ${configFile}`);
+  // console.log(`findUp resolved config file = ${configFile}`);
   let lintErrors: object[] = [];
 
   // If we found a config file, run the linter in a separate process using the config file's
@@ -135,7 +135,7 @@ async function lintTemplate(
     } catch (error) {
       // execa will throw whenever there are lint errors, because ember-template-lint exits
       // nonzero in that case. We can read the JSON result from the error object's stdout.
-      console.log(`error = ${error}`);
+      // console.log(`error = ${error}`);
       if (!error.timedOut) {
         try {
           const jsonResult = JSON.parse(error.stdout);

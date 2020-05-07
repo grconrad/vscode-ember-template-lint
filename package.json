@@ -2,7 +2,7 @@
   "name": "vscode-ember-template-lint",
   "displayName": "(Unofficial) Ember template lint for VS Code",
   "version": "0.0.1",
-  "description": "Lint your templates as you edit them",
+  "description": "See lint issues in Problems view while editing an hbs file",
   "categories": [
     "Other"
   ],
@@ -20,15 +20,16 @@
   "publisher": "grconrad",
   "main": "./out/extension.js",
   "files": [
-    "out",
-    "node_modules"
+    "out"
   ],
   "scripts": {
-    "compile": "tsc -p ./",
+    "build": "tsc -p ./",
+    "clean": "rm -rf out",
     "lint": "eslint src --ext ts",
-    "pretest": "yarn run compile && yarn run lint",
+    "pretest": "yarn build && yarn lint",
     "test": "node ./out/test/runTest.js",
-    "vscode:prepublish": "yarn run compile",
+    "vscode:prepublish": "yarn build",
+    "vsix": "vsce package",
     "watch": "tsc -watch -p ./"
   },
   "activationEvents": [
@@ -42,7 +43,7 @@
     "@types/glob": "^7.1.1",
     "@types/mocha": "^7.0.2",
     "@types/node": "^13.11.0",
-    "@types/vscode": "^1.44.0",
+    "@types/vscode": "^1.40.0",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
     "eslint": "^6.8.0",
@@ -50,10 +51,11 @@
     "mocha": "^7.1.2",
     "sort-package-json": "^1.42.2",
     "typescript": "^3.8.3",
+    "vsce": "^1.75.0",
     "vscode-test": "^1.3.0"
   },
   "engines": {
-    "vscode": "^1.44.0"
+    "vscode": "^1.40.0"
   },
   "volta": {
     "node": "12.13.0",
