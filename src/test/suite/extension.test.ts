@@ -24,7 +24,9 @@ function sleep(ms: number): Promise<void> {
 
 suite("Extension Test Suite", () => {
 
-  before(() => {
+  before(function () {
+    this.timeout(30 * 1000);
+
     // In sample project with ember-template-lint configured, install dependencies.
     // The presence of ember-template-lint in that project is required in order for our extension to
     // successfully lint a template in the project.
@@ -39,11 +41,11 @@ suite("Extension Test Suite", () => {
       assert.fail(err);
     }
 
-    window.showInformationMessage("Start all tests.");
+    // window.showInformationMessage("Start all tests.");
   });
 
   after(() => {
-    window.showInformationMessage("Done with tests.");
+    // window.showInformationMessage("Done with tests.");
   });
 
   test("Extension should activate", async function() {
