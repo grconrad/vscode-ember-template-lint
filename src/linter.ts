@@ -23,9 +23,9 @@ let lintTimeoutId: NodeJS.Timeout | null = null;
  * Run the linter (if appropriate) and update the diagnostics so that any errors appear in the
  * Problems view.
  *
- * This is meant to be invoked by our event handlers for document editing events.
+ * This is meant to be invoked by our document editing event handlers.
  *
- * If template linting does not apply to the document being edited, clear the diagnostics.
+ * If template linting is not applicable, clear the diagnostics.
  */
 export function updateDiagnostics(document: TextDocument, collection: DiagnosticCollection): void {
   // console.log(`updateDiagnostics: document = ${document.uri}`);
@@ -159,9 +159,9 @@ async function lintTemplate(
           lintErrors = jsonResult[targetRelativePath];
         } catch (parseErr) {
           console.error(parseErr);
-          console.log('execa error shown below:');
+          console.log('execa error (stringified) shown below:');
           console.log('-----');
-          console.log(execaErr);
+          console.log(JSON.stringify(execaErr, null, 2));
           console.log('-----');
         }
       }
