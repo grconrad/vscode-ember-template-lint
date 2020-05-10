@@ -6,5 +6,6 @@ set -e
 
 # This could also be done in the test itself, but it's a bug uglier to run a yarn install from JS
 # and adjust timeouts and so on.
+echo "Installing dependencies in sample project"
 cd test-fixtures/sample-project
 yarn install

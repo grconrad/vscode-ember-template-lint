@@ -14,7 +14,7 @@ const FIXTURES_DIR = path.resolve(__dirname, "../../../test-fixtures");
 const EXTENSION_ID = "grconrad.vscode-ember-template-lint";
 
 // Allow an extra half second or so for lint results to be available after the linter is invoked.
-const SLEEP_AFTER_OPEN_MS = 1 * 1000;
+const SLEEP_AFTER_OPEN_MS = 1.5 * 1000;
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => {
@@ -62,7 +62,7 @@ suite("Extension Test Suite", function () {
     this.timeout(5 * 1000);
 
     const hbsDoc = await workspace.openTextDocument(
-      path.join(FIXTURES_DIR, "project-missing-config", "foo", "ignored.hbs")
+      path.resolve(FIXTURES_DIR, "project-missing-config/foo/ignored.hbs")
     );
     const editor = await window.showTextDocument(hbsDoc);
     assert.equal(window.activeTextEditor, editor, "No active editor");
@@ -86,7 +86,7 @@ suite("Extension Test Suite", function () {
     this.timeout(5 * 1000);
 
     const hbsDoc = await workspace.openTextDocument(
-      path.join(FIXTURES_DIR, "project-missing-linter", "foo", "ignored.hbs")
+      path.resolve(FIXTURES_DIR, "project-missing-linter/foo/ignored.hbs")
     );
     const editor = await window.showTextDocument(hbsDoc);
     assert.equal(window.activeTextEditor, editor, "No active editor");
@@ -101,7 +101,7 @@ suite("Extension Test Suite", function () {
     this.timeout(5 * 1000);
 
     const hbsDoc = await workspace.openTextDocument(
-      path.join(FIXTURES_DIR, "sample-project", "foo", "good.hbs")
+      path.resolve(FIXTURES_DIR, "sample-project/foo/good.hbs")
     );
     const editor = await window.showTextDocument(hbsDoc);
     assert.equal(window.activeTextEditor, editor, "No active editor");
@@ -116,7 +116,7 @@ suite("Extension Test Suite", function () {
     this.timeout(5 * 1000);
 
     const hbsDoc = await workspace.openTextDocument(
-      path.join(FIXTURES_DIR, "sample-project", "foo", "invalid-syntax.hbs")
+      path.resolve(FIXTURES_DIR, "sample-project/foo/invalid-syntax.hbs")
     );
     const editor = await window.showTextDocument(hbsDoc);
     assert.equal(window.activeTextEditor, editor, "No active editor");
@@ -138,7 +138,7 @@ suite("Extension Test Suite", function () {
     this.timeout(5 * 1000);
 
     const hbsDoc = await workspace.openTextDocument(
-      path.join(FIXTURES_DIR, "sample-project", "foo", "rule-violation.hbs")
+      path.resolve(FIXTURES_DIR, "sample-project/foo/rule-violation.hbs")
     );
     const editor = await window.showTextDocument(hbsDoc);
     assert.equal(window.activeTextEditor, editor, "No active editor");
