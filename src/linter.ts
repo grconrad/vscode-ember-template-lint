@@ -132,9 +132,9 @@ async function lintTemplate(
         ],
         {
           cwd: configDir, // nearest ancestor with a config file
+          timeout: LINT_TIMEOUT_MS, // auto cancel if it takes a long time
           shell: true,
           input: document.getText(), // pass live document content (maybe unsaved)
-          timeout: LINT_TIMEOUT_MS // auto cancel if it takes a long time
         }
       );
 
@@ -174,18 +174,28 @@ async function lintTemplate(
 
             // Fish out the errors.
             lintIssues = jsonResult[targetRelativePath];
+            console.log(`Found ${lintIssues.length} lint issues`);
           } catch (parseErr) {
-            console.error(`
-  Could not parse JSON from lint output:
+            console.error(`Could not parse JSON from lint output`);
+            console.error('execaErr (raw)');
+            console.error('-----');
+            console.error(execaErr);
+            console.error(`execaErr.stdout:
   -----
   ${execaErr.stdout}
-  -----
-  execaErr:
+  -----`    );
+            console.error(`execaErr (toString):
   -----
   ${execaErr}
+  -----`    );
+            console.error(`parseErr:
   -----
-  `
-            );
+  ${parseErr}
+  -----`    );
+            console.log('execaErr:');
+            console.log('-----');
+            console.log(execaErr);
+            console.log('-----');
           }
         }
       } else {
