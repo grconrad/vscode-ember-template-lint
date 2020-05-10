@@ -177,6 +177,10 @@ async function lintTemplate(
             console.log(`Found ${lintIssues.length} lint issues`);
           } catch (parseErr) {
             console.error(`Could not parse JSON from lint output`);
+            console.log('execaErr (stringified with JSON.stringify)');
+            console.log('-----');
+            console.log(JSON.stringify(execaErr, null, 2));
+            console.log('-----');
             console.log('execaErr (raw, log)');
             console.log('-----');
             console.log(execaErr);
@@ -186,17 +190,17 @@ async function lintTemplate(
             console.error(execaErr);
             console.error('-----');
             console.error(`execaErr.stdout:
-  -----
-  ${execaErr.stdout}
-  -----`    );
+-----
+${execaErr.stdout}
+-----`      );
             console.error(`execaErr (toString):
-  -----
-  ${execaErr}
-  -----`    );
+-----
+${execaErr}
+-----`      );
             console.error(`parseErr:
-  -----
-  ${parseErr}
-  -----`    );
+-----
+${parseErr}
+-----`      );
             console.log('execaErr:');
             console.log('-----');
             console.log(execaErr);
