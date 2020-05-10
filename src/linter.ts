@@ -6,8 +6,8 @@ import {
   TextDocument
 } from 'vscode';
 import * as path from 'path';
-const execa = require('execa');
-const findUp = require('find-up');
+import * as execa from 'execa';
+import * as findUp from 'find-up';
 
 // Save some CPU by not linting immediately after each keystroke in the editor.
 // A sub-second delay is not noticeable.
@@ -70,14 +70,23 @@ export function updateDiagnostics(document: TextDocument, collection: Diagnostic
 function getDiagnosticForLintResult(lintResult: any): Diagnostic {
   const { rule, message, severity, line, column } = lintResult;
   const result: any = {
-    code: rule,
     message: message,
     severity: (severity === 2) ? DiagnosticSeverity.Error : DiagnosticSeverity.Information,
     source: 'ember-template-linter',
   };
+  // Observation: rule, line, and column are sometimes missing in the lint error object.
+  // This seems to happen when there are basic parse errors fatal to the linter.
+  if (rule) {
+    result.code = rule;
+  }
   if (line !== undefined && column !== undefined) {
-    // ember-template-lint reports 1-based line and column numbers
-    // VS Code wants them 0-based
+    // The linter reports 1-based line numbers. VS Code wants those to be 0-based.
+
+    // As for column numbers, the linter reports only the start column for each issue. Since we
+    // don't know the full range of characters causing the issue, just include a single character in
+    // the range we hand to VS Code. The editor will show a red squiggly on only a single character,
+    // but it's probably better than the alternative (underlining the whole line).
+
     result.range = new Range(line - 1, column, line - 1, column + 1);
   }
   // console.log(`Giving VS Code the diagnostic: ${JSON.stringify(result, null, 2)}`);
@@ -101,18 +110,19 @@ async function lintTemplate(
     cwd: targetDir
   });
   // console.log(`findUp resolved config file = ${configFile}`);
-  let lintErrors: object[] = [];
+  let lintIssues: object[] = [];
 
   // If we found a config file, run the linter in a separate process using the config file's
   // directory as the cwd. This ensures we use that project's ember-template-lint dependency and
   // should ensure its .template-lintrc.js config is resolved correctly. But it can also fail, if
-  // e.g. the dependencies have not been vendored (node_modules is missing or does not contain
-  // ember-template-lint).
+  // e.g. the dependencies have not been vendored or the CLI can't be found in node_modules or can't
+  // be invoked for whatever reason.
   if (configFile) {
     const configDir = path.dirname(configFile);
     const targetRelativePath = path.relative(configDir, targetPath);
 
     try {
+
       await execa(
         `./node_modules/.bin/ember-template-lint`,
         [
@@ -127,14 +137,19 @@ async function lintTemplate(
           timeout: LINT_TIMEOUT_MS // auto cancel if it takes a long time
         }
       );
-      // If we make it here, ember-template-lint exited zero.
-      // This seems to indicate that there were no lint errors.
-      // There's no need to do anything here; linterErrors is already [].
-      // console.log(processResult);
+
+      // If we make it here, ember-template-lint exited 0. There's no need to do anything here,
+      // since lintIssues is already [].
+
+      // Lint issues cause ember-template-lint to exit nonzero, and execa throws. The 'catch' block
+      // below is the expected flow when the lint CLI reports issues.
+
     } catch (execaErr) {
-      // execa will throw whenever there are lint errors, because ember-template-lint exits
-      // nonzero in that case. We can read the JSON result from the error object's stdout.
-      // console.log(`error = ${error}`);
+
+      // We can read the JSON result from the error object's stdout.
+
+      // console.debug(execaErr);
+
       if (!execaErr.timedOut) {
         try {
           const jsonResult = JSON.parse(execaErr.stdout);
@@ -155,27 +170,28 @@ async function lintTemplate(
           // }
           //
           // Fish out the errors.
-          lintErrors = jsonResult[targetRelativePath];
+          // console.debug('jsonResult =');
+          // console.debug(jsonResult);
+          // console.debug('-----');
+          lintIssues = jsonResult[targetRelativePath];
         } catch (parseErr) {
-          console.error(parseErr);
-          console.log('execa error:');
-          console.log('-----');
-          console.log(execaErr);
-          console.log('-----');
-          console.log('execa error (stringified):');
-          console.log('-----');
-          console.log(JSON.stringify(execaErr, null, 2));
-          console.log('-----');
+          console.debug(parseErr);
+          // console.debug('execa error:');
+          // console.debug('-----');
+          // console.debug(execaErr);
+          // console.debug('-----');
+          // console.debug('execa error (stringified):');
+          // console.debug('-----');
+          // console.debug(JSON.stringify(execaErr, null, 2));
+          // console.debug('-----');
         }
       }
     }
   }
 
-  if (lintErrors.length) {
-    // console.log(`Lint errors: ${JSON.stringify(lintErrors, null, 2)}`);
-  } else {
-    // console.log('No lint errors, or lint operation could not be performed');
-  }
+  // console.log(`${lintIssues.length} lint issues detected`);
 
-  collection.set(document.uri, lintErrors.map(getDiagnosticForLintResult));
+  const diagnostics = lintIssues.map(lintIssue => getDiagnosticForLintResult(lintIssue));
+  collection.set(document.uri, diagnostics);
+  // console.debug(`${diagnostics.length} issues computed for doc ${document.uri.fsPath}`);
 }
