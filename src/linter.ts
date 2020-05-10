@@ -145,10 +145,9 @@ async function lintTemplate(
       // below is the expected flow when the lint CLI reports issues.
 
     } catch (execaErr) {
+      // console.debug(execaErr);
 
       // We can read the JSON result from the error object's stdout.
-
-      // console.debug(execaErr);
 
       if (!execaErr.timedOut) {
         try {
@@ -169,13 +168,15 @@ async function lintTemplate(
           //   ]
           // }
           //
-          // Fish out the errors.
+
           // console.debug('jsonResult =');
           // console.debug(jsonResult);
           // console.debug('-----');
+
+          // Fish out the errors.
           lintIssues = jsonResult[targetRelativePath];
         } catch (parseErr) {
-          console.debug(parseErr);
+          console.error(parseErr);
           // console.debug('execa error:');
           // console.debug('-----');
           // console.debug(execaErr);
@@ -185,6 +186,8 @@ async function lintTemplate(
           // console.debug(JSON.stringify(execaErr, null, 2));
           // console.debug('-----');
         }
+      } else {
+        console.error('Lint timed out');
       }
     }
   }
@@ -193,5 +196,5 @@ async function lintTemplate(
 
   const diagnostics = lintIssues.map(lintIssue => getDiagnosticForLintResult(lintIssue));
   collection.set(document.uri, diagnostics);
-  // console.debug(`${diagnostics.length} issues computed for doc ${document.uri.fsPath}`);
+  console.error(`${diagnostics.length} issues computed for doc ${document.uri.fsPath}`);
 }
