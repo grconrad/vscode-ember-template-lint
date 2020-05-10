@@ -123,7 +123,7 @@ async function lintTemplate(
 
     try {
 
-      execa.sync(
+      await execa.sync(
         './node_modules/.bin/ember-template-lint',
         [
           '--json',
