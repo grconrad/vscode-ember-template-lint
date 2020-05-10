@@ -176,15 +176,7 @@ async function lintTemplate(
           // Fish out the errors.
           lintIssues = jsonResult[targetRelativePath];
         } catch (parseErr) {
-          console.error(parseErr);
-          // console.debug('execa error:');
-          // console.debug('-----');
-          // console.debug(execaErr);
-          // console.debug('-----');
-          // console.debug('execa error (stringified):');
-          // console.debug('-----');
-          // console.debug(JSON.stringify(execaErr, null, 2));
-          // console.debug('-----');
+          console.error('Could not parse JSON from lint output');
         }
       } else {
         console.error('Lint timed out');
