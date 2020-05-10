@@ -9,3 +9,5 @@ set -e
 echo "Installing dependencies in sample project"
 cd test-fixtures/sample-project
 yarn install
+
+cd ../..

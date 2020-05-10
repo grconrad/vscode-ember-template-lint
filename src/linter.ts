@@ -124,10 +124,10 @@ async function lintTemplate(
     try {
 
       await execa(
-        `./node_modules/.bin/ember-template-lint`,
+        './node_modules/.bin/ember-template-lint',
         [
-          `--json`,
-          `--filename`,
+          '--json',
+          '--filename',
           targetRelativePath,
         ],
         {
