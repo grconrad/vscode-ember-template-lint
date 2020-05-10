@@ -177,9 +177,14 @@ async function lintTemplate(
             console.log(`Found ${lintIssues.length} lint issues`);
           } catch (parseErr) {
             console.error(`Could not parse JSON from lint output`);
+            console.log('execaErr (raw, log)');
+            console.log('-----');
+            console.log(execaErr);
+            console.log('-----');
             console.error('execaErr (raw)');
             console.error('-----');
             console.error(execaErr);
+            console.error('-----');
             console.error(`execaErr.stdout:
   -----
   ${execaErr.stdout}
