@@ -5,9 +5,10 @@ import {
   Range,
   TextDocument
 } from 'vscode';
-import * as path from 'path';
-import * as execa from 'execa';
+import * as cp from 'child_process';
+// import * as execa from 'execa';
 import * as findUp from 'find-up';
+import * as path from 'path';
 
 // Save some CPU by not linting immediately after each keystroke in the editor.
 // A sub-second delay is not noticeable.
@@ -121,9 +122,26 @@ async function lintTemplate(
     const configDir = path.dirname(configFile);
     const targetRelativePath = path.relative(configDir, targetPath);
 
+    // Invoke ember-template-lint. The result will be similar to the following, with a list of
+    // errors keyed by the file path we specify on the command.
+    //
+    // {
+    //   "app/templates/head.hbs": [
+    //     {
+    //       "fatal": true,
+    //       "severity": 2,
+    //       "filePath": "app/templates/head.hbs",
+    //       "moduleId": "app/templates/head",
+    //       "message": "Blah blah blah",
+    //       "source": "Error: Blah blah blah"
+    //     },
+    //     ...
+    //   ]
+    // }
+
     try {
 
-      await execa(
+      const result = cp.spawnSync(
         './node_modules/.bin/ember-template-lint',
         [
           '--json',
@@ -133,10 +151,40 @@ async function lintTemplate(
         {
           cwd: configDir, // nearest ancestor with a config file
           timeout: LINT_TIMEOUT_MS, // auto cancel if it takes a long time
-          // shell: true,
-          input: document.getText(), // pass live document content (maybe unsaved)
+          input: document.getText(),
         }
       );
+      const {stdout, stderr, status, signal, error} = result;
+      console.log(result);
+      if (status !== 0) {
+        try {
+          // We hope the output is valid JSON so we can parse it.
+          // If it isn't, that's probably a bug in ember-template-lint since we asked for json.
+          const json = stdout.toString(); // we hope it's valid json
+          const jsonResult = JSON.parse(json);
+
+          // Fish out the errors.
+          lintIssues = jsonResult[targetRelativePath];
+
+          console.log(`Linter reported ${lintIssues.length} issues`);
+        } catch (parseErr) {
+          console.error('Could not parse JSON from lint output');
+        }
+      }
+      // await execa(
+      //   './node_modules/.bin/ember-template-lint',
+      //   [
+      //     '--json',
+      //     '--filename',
+      //     targetRelativePath,
+      //   ],
+      //   {
+      //     cwd: configDir, // nearest ancestor with a config file
+      //     timeout: LINT_TIMEOUT_MS, // auto cancel if it takes a long time
+      //     // shell: true,
+      //     input: document.getText(), // pass live document content (maybe unsaved)
+      //   }
+      // );
 
       // If we make it here, ember-template-lint exited 0. There's no need to do anything here,
       // since lintIssues is already [].
