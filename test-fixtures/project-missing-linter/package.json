@@ -1,5 +1,5 @@
 {
-  "name": "project-missing-config",
+  "name": "project-missing-linter",
   "version": "0.0.1",
   "devDependencies": {
     "ember-template-lint": "^2.6.0"
