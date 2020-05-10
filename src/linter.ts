@@ -133,7 +133,7 @@ async function lintTemplate(
         {
           cwd: configDir, // nearest ancestor with a config file
           timeout: LINT_TIMEOUT_MS, // auto cancel if it takes a long time
-          shell: true,
+          // shell: true,
           input: document.getText(), // pass live document content (maybe unsaved)
         }
       );
