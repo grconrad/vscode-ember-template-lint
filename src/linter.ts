@@ -155,7 +155,6 @@ async function lintTemplate(
         }
       );
       const {stdout, stderr, status, signal, error} = result;
-      console.log(result);
       if (status !== 0) {
         try {
           // We hope the output is valid JSON so we can parse it.
@@ -169,6 +168,8 @@ async function lintTemplate(
           console.log(`Linter reported ${lintIssues.length} issues`);
         } catch (parseErr) {
           console.error('Could not parse JSON from lint output');
+          console.error(result);
+          console.error(parseErr);
         }
       }
       // await execa(
