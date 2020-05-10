@@ -15,7 +15,7 @@ const DELAY_BEFORE_LINT_MS = 0.5 * 1000;
 
 // If the lint operation doesn't complete quickly, cancel it.
 // We don't want to degrade the editor experience.
-const LINT_TIMEOUT_MS = 2 * 1000;
+const LINT_TIMEOUT_MS = 1 * 1000;
 
 let lintTimeoutId: NodeJS.Timeout | null = null;
 
@@ -145,38 +145,48 @@ async function lintTemplate(
       // below is the expected flow when the lint CLI reports issues.
 
     } catch (execaErr) {
-      // console.debug(execaErr);
-
       // We can read the JSON result from the error object's stdout.
 
       if (!execaErr.timedOut) {
-        try {
-          const jsonResult = JSON.parse(execaErr.stdout);
-          // Result is like the following, with a list of errors keyed by file (relative path).
-          //
-          // {
-          //   "app/templates/head.hbs": [
-          //     {
-          //       "fatal": true,
-          //       "severity": 2,
-          //       "filePath": "app/templates/head.hbs",
-          //       "moduleId": "app/templates/head",
-          //       "message": "Blah blah blah",
-          //       "source": "Error: Blah blah blah"
-          //     },
-          //     ...
-          //   ]
-          // }
-          //
+        if (execaErr.stdout !== '') {
+          try {
+            const jsonResult = JSON.parse(execaErr.stdout);
+            // Result is like the following, with a list of errors keyed by file (relative path).
+            //
+            // {
+            //   "app/templates/head.hbs": [
+            //     {
+            //       "fatal": true,
+            //       "severity": 2,
+            //       "filePath": "app/templates/head.hbs",
+            //       "moduleId": "app/templates/head",
+            //       "message": "Blah blah blah",
+            //       "source": "Error: Blah blah blah"
+            //     },
+            //     ...
+            //   ]
+            // }
+            //
 
-          // console.debug('jsonResult =');
-          // console.debug(jsonResult);
-          // console.debug('-----');
+            // console.debug('jsonResult =');
+            // console.debug(jsonResult);
+            // console.debug('-----');
 
-          // Fish out the errors.
-          lintIssues = jsonResult[targetRelativePath];
-        } catch (parseErr) {
-          console.error('Could not parse JSON from lint output');
+            // Fish out the errors.
+            lintIssues = jsonResult[targetRelativePath];
+          } catch (parseErr) {
+            console.error(`
+  Could not parse JSON from lint output:
+  -----
+  ${execaErr.stdout}
+  -----
+  execaErr:
+  -----
+  ${execaErr}
+  -----
+  `
+            );
+          }
         }
       } else {
         console.error('Lint timed out');
