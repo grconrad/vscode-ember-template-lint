@@ -154,7 +154,14 @@ async function lintTemplate(
           input: document.getText(),
         }
       );
-      const {stdout, stderr, status, signal, error} = result;
+      const {signal, status, stdout, stderr, error} = result;
+      if (error) {
+        console.error(error);
+      }
+      console.error(`signal=${signal}`);
+      console.error(`status=${status}`);
+      console.error(`stdout=${stdout.toString()}`);
+      console.error(`stderr=${stderr.toString()}`);
       if (status !== 0) {
         try {
           // We hope the output is valid JSON so we can parse it.
