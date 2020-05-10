@@ -49,7 +49,7 @@ suite("Extension Test Suite", function () {
     }
   });
 
-  // TODO: Consider different behavior for this case.
+  // TODO: What's the best way to handle missing lint config or linter?
   //
   // Option 1: Skip linting / return no diagnostics (current behavior)
   //
@@ -58,81 +58,73 @@ suite("Extension Test Suite", function () {
   //
   // Option 3: Look for a globally installed ember-template-lint, similar to documented behavior of
   // eslint extension (dbaeumer.vscode-eslint)
-  test("Project with no lint config > Any hbs (contents irrelevant)", async function() {
-    this.timeout(5 * 1000);
 
-    const hbsDoc = await workspace.openTextDocument(
-      path.resolve(FIXTURES_DIR, "project-missing-config/foo/ignored.hbs")
-    );
-    const editor = await window.showTextDocument(hbsDoc);
-    assert.equal(window.activeTextEditor, editor, "No active editor");
+  // test("Project with no lint config > Any hbs (contents irrelevant)", async function() {
+  //   this.timeout(5 * 1000);
 
-    await sleep(SLEEP_AFTER_OPEN_MS);
+  //   const hbsDoc = await workspace.openTextDocument(
+  //     path.resolve(FIXTURES_DIR, "project-missing-config/foo/ignored.hbs")
+  //   );
+  //   const editor = await window.showTextDocument(hbsDoc);
+  //   assert.equal(window.activeTextEditor, editor, "No active editor");
 
-    const diagnostics = languages.getDiagnostics(hbsDoc.uri);
-    assert.ok(diagnostics.length === 0, "Expected no diagnostics due to missing lint config");
-  });
+  //   await sleep(SLEEP_AFTER_OPEN_MS);
 
-  // TODO: Consider different behavior for this case.
-  //
-  // Option 1: Skip linting / return no diagnostics (current behavior)
-  //
-  // Option 2: Create a warning diagnostic with a message like "Cannot run ember-template-lint;
-  // please install dependencies in this project."
-  //
-  // Option 3: Look for a globally installed ember-template-lint, similar to documented behavior of
-  // eslint extension (dbaeumer.vscode-eslint)
-  test("Project with no linter > Any template (contents irrelevant)", async function() {
-    this.timeout(5 * 1000);
+  //   const diagnostics = languages.getDiagnostics(hbsDoc.uri);
+  //   assert.ok(diagnostics.length === 0, "Expected no diagnostics due to missing lint config");
+  // });
 
-    const hbsDoc = await workspace.openTextDocument(
-      path.resolve(FIXTURES_DIR, "project-missing-linter/foo/ignored.hbs")
-    );
-    const editor = await window.showTextDocument(hbsDoc);
-    assert.equal(window.activeTextEditor, editor, "No active editor");
+  // test("Project with no linter > Any template (contents irrelevant)", async function() {
+  //   this.timeout(5 * 1000);
 
-    await sleep(SLEEP_AFTER_OPEN_MS);
+  //   const hbsDoc = await workspace.openTextDocument(
+  //     path.resolve(FIXTURES_DIR, "project-missing-linter/foo/ignored.hbs")
+  //   );
+  //   const editor = await window.showTextDocument(hbsDoc);
+  //   assert.equal(window.activeTextEditor, editor, "No active editor");
 
-    const diagnostics = languages.getDiagnostics(hbsDoc.uri);
-    assert.ok(diagnostics.length === 0, "Expected no diagnostics due to missing linter");
-  });
+  //   await sleep(SLEEP_AFTER_OPEN_MS);
 
-  test("Complete project > Valid template", async function() {
-    this.timeout(5 * 1000);
+  //   const diagnostics = languages.getDiagnostics(hbsDoc.uri);
+  //   assert.ok(diagnostics.length === 0, "Expected no diagnostics due to missing linter");
+  // });
 
-    const hbsDoc = await workspace.openTextDocument(
-      path.resolve(FIXTURES_DIR, "sample-project/foo/good.hbs")
-    );
-    const editor = await window.showTextDocument(hbsDoc);
-    assert.equal(window.activeTextEditor, editor, "No active editor");
+  // test("Complete project > Valid template", async function() {
+  //   this.timeout(5 * 1000);
 
-    await sleep(SLEEP_AFTER_OPEN_MS);
+  //   const hbsDoc = await workspace.openTextDocument(
+  //     path.resolve(FIXTURES_DIR, "sample-project/foo/good.hbs")
+  //   );
+  //   const editor = await window.showTextDocument(hbsDoc);
+  //   assert.equal(window.activeTextEditor, editor, "No active editor");
 
-    const diagnostics = languages.getDiagnostics(hbsDoc.uri);
-    assert.ok(diagnostics.length === 0, "Expected no diagnostics");
-  });
+  //   await sleep(SLEEP_AFTER_OPEN_MS);
 
-  test("Complete project > Template with invalid syntax", async function() {
-    this.timeout(5 * 1000);
+  //   const diagnostics = languages.getDiagnostics(hbsDoc.uri);
+  //   assert.ok(diagnostics.length === 0, "Expected no diagnostics");
+  // });
 
-    const hbsDoc = await workspace.openTextDocument(
-      path.resolve(FIXTURES_DIR, "sample-project/foo/invalid-syntax.hbs")
-    );
-    const editor = await window.showTextDocument(hbsDoc);
-    assert.equal(window.activeTextEditor, editor, "No active editor");
+  // test("Complete project > Template with invalid syntax", async function() {
+  //   this.timeout(5 * 1000);
 
-    await sleep(SLEEP_AFTER_OPEN_MS);
+  //   const hbsDoc = await workspace.openTextDocument(
+  //     path.resolve(FIXTURES_DIR, "sample-project/foo/invalid-syntax.hbs")
+  //   );
+  //   const editor = await window.showTextDocument(hbsDoc);
+  //   assert.equal(window.activeTextEditor, editor, "No active editor");
 
-    const diagnostics = languages.getDiagnostics(hbsDoc.uri);
-    assert.ok(diagnostics.length > 0, "Expected some error diagnostics");
-    assert.ok(
-      diagnostics.some((diagnostic) => {
-        const { severity, message } = diagnostic;
-        return (severity === DiagnosticSeverity.Error) && message.includes("Parse error");
-      }),
-      "Expected a parse error from the linter"
-    );
-  });
+  //   await sleep(SLEEP_AFTER_OPEN_MS);
+
+  //   const diagnostics = languages.getDiagnostics(hbsDoc.uri);
+  //   assert.ok(diagnostics.length > 0, "Expected some error diagnostics");
+  //   assert.ok(
+  //     diagnostics.some((diagnostic) => {
+  //       const { severity, message } = diagnostic;
+  //       return (severity === DiagnosticSeverity.Error) && message.includes("Parse error");
+  //     }),
+  //     "Expected a parse error from the linter"
+  //   );
+  // });
 
   test("Complete project > Template with rule violation", async function() {
     this.timeout(5 * 1000);
