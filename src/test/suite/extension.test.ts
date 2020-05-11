@@ -144,7 +144,7 @@ suite("Extension Test Suite", function () {
         const { severity, code } = diagnostic;
         return (severity === DiagnosticSeverity.Error) && (code === "no-bare-strings");
       }),
-      "Expected a parse error from the linter"
+      "Expected a rule violation from the linter"
     );
   });
 
