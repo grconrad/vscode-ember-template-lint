@@ -30,14 +30,16 @@ jobs:
       - name: Build
         run: yarn build
       - name: Test ember-template-lint
+        working-directory: ./test-fixtures/sample-project
         run: |
           yarn install
+          echo "Piping a string to stdin:"
           cat foo/rule-violation.hbs | node_modules/.bin/ember-template-lint --json --filename foo/rule-violation.hbs
-          echo "RGC"
-        working-directory: ./test-fixtures/sample-project
+          echo "Direct file input:"
+          node_modules/.bin/ember-template-lint --json foo/rule-violation.hbs
+          echo "Done with test commands"
         shell: sh {0}
       - name: Run integration tests
         uses: GabrielBB/xvfb-action@v1.2
         with:
-          shell: sh {0}
           run: yarn test
