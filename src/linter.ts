@@ -160,16 +160,19 @@ async function lintTemplate(
       }
       console.error(`signal=${signal}`);
       console.error(`status=${status}`);
-      console.error(`stdout=${stdout.toString()}`);
+      const output = stdout.toString();
+      console.error(`stdout=${output}`);
       console.error(`stderr=${stderr.toString()}`);
-      if (status !== 0) {
+      if ((signal || status) && output !== '') {
         try {
-          // We hope the output is valid JSON so we can parse it.
           // If it isn't, it could be a bug in ember-template-lint since we asked for json.
-          // Or, it could be that the GitHub Actions test runner
-          const json = stdout.toString(); // we hope it's valid json
+          // Or, if we're running in CI it could be that the test runner environment is adding
+          // spurious "##[error]" strings after the json.
+          const maybeJson = output;
 
-          const jsonResult = JSON.parse(json);
+          console.log(`NODE_ENV=${process.env.NODE_ENV}`, `CI=${process.env.CI}`);
+
+          const jsonResult = JSON.parse(maybeJson);
 
           // Fish out the errors.
           lintIssues = jsonResult[targetRelativePath];
