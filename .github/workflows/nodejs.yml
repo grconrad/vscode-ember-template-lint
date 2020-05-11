@@ -38,3 +38,5 @@ jobs:
         uses: GabrielBB/xvfb-action@v1.2
         with:
           run: yarn test
+        env:
+          CI: false
