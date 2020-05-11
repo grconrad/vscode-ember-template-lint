@@ -97,10 +97,10 @@ function getDiagnosticForLintResult(lintResult: any): Diagnostic {
 /**
  * Lint the target file (hbs template).
  */
-async function lintTemplate(
+function lintTemplate(
   document: TextDocument,
   collection: DiagnosticCollection
-): Promise<void> {
+): void {
 
   const targetPath = document.uri.fsPath; // absolute path to hbs
   const targetDir = path.dirname(targetPath);
@@ -139,145 +139,60 @@ async function lintTemplate(
     //   ]
     // }
 
-    try {
-
-      const result = cp.spawnSync(
-        './node_modules/.bin/ember-template-lint',
-        [
-          '--json',
-          '--filename',
-          targetRelativePath,
-        ],
-        {
-          cwd: configDir, // nearest ancestor with a config file
-          timeout: LINT_TIMEOUT_MS, // auto cancel if it takes a long time
-          input: document.getText(),
-        }
-      );
-      const {signal, status, stdout, stderr, error} = result;
-      if (error) {
-        console.error(error);
+    const result = cp.spawnSync(
+      './node_modules/.bin/ember-template-lint',
+      [
+        '--json',
+        '--filename',
+        targetRelativePath,
+      ],
+      {
+        cwd: configDir, // nearest ancestor with a config file
+        timeout: LINT_TIMEOUT_MS, // auto cancel if it takes a long time
+        input: document.getText(),
       }
-      console.error(`signal=${signal}`);
-      console.error(`status=${status}`);
-      const output = stdout.toString();
-      console.error(`stdout=${output}`);
-      console.error(`stderr=${stderr.toString()}`);
-      if ((signal || status) && output !== '') {
-        try {
-          // If it isn't, it could be a bug in ember-template-lint since we asked for json.
-          // Or, if we're running in CI it could be that the test runner environment is adding
-          // spurious "##[error]" strings after the json.
-          const maybeJson = output;
+    );
 
-          console.log(`NODE_ENV=${process.env.NODE_ENV}`, `CI=${process.env.CI}`);
+    const {signal, status, stdout, stderr, error} = result;
 
-          const jsonResult = JSON.parse(maybeJson);
+    if (error) {
+      console.error(error);
+    }
 
-          // Fish out the errors.
-          lintIssues = jsonResult[targetRelativePath];
+    console.log(
+      `signal=${signal}`,
+      `status=${status}`
+    );
+    const output = stdout.toString();
+    // console.error(`stdout=${output}`);
+    // console.error(`stderr=${stderr.toString()}`);
 
-          console.log(`Linter reported ${lintIssues.length} issues`);
-        } catch (parseErr) {
-          console.log(process.env);
-          console.error('Could not parse JSON from lint output');
-          console.error(result);
-          console.error(parseErr);
-        }
-      }
-      // await execa(
-      //   './node_modules/.bin/ember-template-lint',
-      //   [
-      //     '--json',
-      //     '--filename',
-      //     targetRelativePath,
-      //   ],
-      //   {
-      //     cwd: configDir, // nearest ancestor with a config file
-      //     timeout: LINT_TIMEOUT_MS, // auto cancel if it takes a long time
-      //     // shell: true,
-      //     input: document.getText(), // pass live document content (maybe unsaved)
-      //   }
-      // );
+    // Lint issues cause ember-template-lint to exit nonzero, which we see as the status on the
+    // child process. There should also be some stdout
 
-      // If we make it here, ember-template-lint exited 0. There's no need to do anything here,
-      // since lintIssues is already [].
+    if ((signal || status !== 0) && output !== '') {
+      try {
+        // If it isn't, it could be a bug in ember-template-lint since we asked for json.
+        // Or, if we're running in CI it could be that the test runner environment is adding
+        // spurious "##[error]" strings after the json.
+        const maybeJson = output;
 
-      // Lint issues cause ember-template-lint to exit nonzero, and execa throws. The 'catch' block
-      // below is the expected flow when the lint CLI reports issues.
+        const jsonResult = JSON.parse(maybeJson);
 
-    } catch (execaErr) {
-      // We can read the JSON result from the error object's stdout.
+        // Fish out the errors.
+        lintIssues = jsonResult[targetRelativePath];
 
-      if (!execaErr.timedOut) {
-        if (execaErr.stdout !== '') {
-          try {
-            const jsonResult = JSON.parse(execaErr.stdout);
-            // Result is like the following, with a list of errors keyed by file (relative path).
-            //
-            // {
-            //   "app/templates/head.hbs": [
-            //     {
-            //       "fatal": true,
-            //       "severity": 2,
-            //       "filePath": "app/templates/head.hbs",
-            //       "moduleId": "app/templates/head",
-            //       "message": "Blah blah blah",
-            //       "source": "Error: Blah blah blah"
-            //     },
-            //     ...
-            //   ]
-            // }
-            //
-
-            // console.debug('jsonResult =');
-            // console.debug(jsonResult);
-            // console.debug('-----');
-
-            // Fish out the errors.
-            lintIssues = jsonResult[targetRelativePath];
-            console.log(`Found ${lintIssues.length} lint issues`);
-          } catch (parseErr) {
-            console.error(`Could not parse JSON from lint output`);
-            console.log('execaErr (stringified with JSON.stringify)');
-            console.log('-----');
-            console.log(JSON.stringify(execaErr, null, 2));
-            console.log('-----');
-            console.log('execaErr (raw, log)');
-            console.log('-----');
-            console.log(execaErr);
-            console.log('-----');
-            console.error('execaErr (raw)');
-            console.error('-----');
-            console.error(execaErr);
-            console.error('-----');
-            console.error(`execaErr.stdout:
------
-${execaErr.stdout}
------`      );
-            console.error(`execaErr (toString):
------
-${execaErr}
------`      );
-            console.error(`parseErr:
------
-${parseErr}
------`      );
-            console.log('execaErr:');
-            console.log('-----');
-            console.log(execaErr);
-            console.log('-----');
-          }
-        }
-      } else {
-        console.error('Lint timed out');
+        console.log(`Linter reported ${lintIssues.length} issues`);
+      } catch (parseErr) {
+        console.log(process.env);
+        console.error('Could not parse JSON from lint output');
+        console.error(result);
+        console.error(parseErr);
       }
     }
   }
 
-  // console.log(`${lintIssues.length} lint issues detected`);
-
-  const diagnostics = lintIssues.map(lintIssue => getDiagnosticForLintResult(lintIssue));
+  const diagnostics = lintIssues.map(issue => getDiagnosticForLintResult(issue));
   collection.set(document.uri, diagnostics);
   console.error(`${diagnostics.length} issues computed for doc ${document.uri.fsPath}`);
 }
