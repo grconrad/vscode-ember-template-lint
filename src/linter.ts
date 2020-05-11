@@ -175,9 +175,12 @@ function lintTemplate(
         // ember-template-lint. It's pretty consistently happening in the GitHub Actions workflow,
         // and we have to strip out that part before attempting to parse the JSON.
         if (process.env.CI === 'true') {
+          console.error(`before: output=${output}`);
           const testRunnerErrorFragmentIdx = output.indexOf('##[error]');
+          console.error(`found marker at position ${testRunnerErrorFragmentIdx}`);
           if (testRunnerErrorFragmentIdx !== -1) {
             output = output.substring(0, testRunnerErrorFragmentIdx);
+            console.error(`after: output=${output}`);
           }
         }
 
@@ -194,7 +197,6 @@ function lintTemplate(
           console.error(stdout.toString());
           console.error('-----');
           console.error(parseErr);
-          console.error('Could not parse JSON from lint output');
         }
       }
 
