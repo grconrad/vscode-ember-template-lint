@@ -6,7 +6,6 @@ import {
   TextDocument
 } from 'vscode';
 import * as cp from 'child_process';
-// import * as execa from 'execa';
 import * as findUp from 'find-up';
 import * as path from 'path';
 
@@ -16,7 +15,7 @@ const DELAY_BEFORE_LINT_MS = 0.5 * 1000;
 
 // If the lint operation doesn't complete quickly, cancel it.
 // We don't want to degrade the editor experience.
-const LINT_TIMEOUT_MS = 1 * 1000;
+const LINT_TIMEOUT_MS = 2 * 1000;
 
 let lintTimeoutId: NodeJS.Timeout | null = null;
 
@@ -156,40 +155,48 @@ function lintTemplate(
     const {signal, status, stdout, stderr, error} = result;
 
     if (error) {
+      // We couldn't run ember-template-lint.
+      // It can happen when the project doesn't have node_modules (error.code === ENOENT)
+
+      // Just swallow it
       console.error(error);
-    }
 
-    console.log(
-      `signal=${signal}`,
-      `status=${status}`
-    );
-    const output = stdout.toString();
-    // console.error(`stdout=${output}`);
-    // console.error(`stderr=${stderr.toString()}`);
+    } else {
 
-    // Lint issues cause ember-template-lint to exit nonzero, which we see as the status on the
-    // child process. There should also be some stdout
+      let output = stdout.toString();
 
-    if ((signal || status !== 0) && output !== '') {
-      try {
-        // If it isn't, it could be a bug in ember-template-lint since we asked for json.
-        // Or, if we're running in CI it could be that the test runner environment is adding
-        // spurious "##[error]" strings after the json.
-        const maybeJson = output;
+      // console.log(`signal=${signal}`, `status=${status}`);
+      // console.error(`stdout=${output}`);
+      // console.error(`stderr=${stderr.toString()}`);
 
-        const jsonResult = JSON.parse(maybeJson);
+      if (status !== 0 && output !== '') {
 
-        // Fish out the errors.
-        lintIssues = jsonResult[targetRelativePath];
+        // In CI the test runner environment adds "##[error]" text after the JSON output of
+        // ember-template-lint. It's pretty consistently happening in the GitHub Actions workflow,
+        // and we have to strip out that part before attempting to parse the JSON.
+        if (process.env.CI === 'true') {
+          const testRunnerErrorFragmentIdx = output.indexOf('##[error]');
+          output = output.substring(0, testRunnerErrorFragmentIdx);
+        }
 
-        console.log(`Linter reported ${lintIssues.length} issues`);
-      } catch (parseErr) {
-        console.log(process.env);
-        console.error('Could not parse JSON from lint output');
-        console.error(result);
-        console.error(parseErr);
+        try {
+          // If it isn't, it could be a bug in ember-template-lint since we asked for json.
+          const jsonResult = JSON.parse(output);
+
+          // Fish out the errors.
+          lintIssues = jsonResult[targetRelativePath];
+
+          console.log(`Linter reported ${lintIssues.length} issues`);
+        } catch (parseErr) {
+          console.error(process.env);
+          console.error('Could not parse JSON from lint output');
+          console.error(result);
+          console.error(parseErr);
+        }
       }
+
     }
+
   }
 
   const diagnostics = lintIssues.map(issue => getDiagnosticForLintResult(issue));
