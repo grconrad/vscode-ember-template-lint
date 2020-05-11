@@ -190,10 +190,11 @@ function lintTemplate(
 
           console.log(`Linter reported ${lintIssues.length} issues`);
         } catch (parseErr) {
-          console.error(process.env);
-          console.error('Could not parse JSON from lint output');
-          console.error(result);
+          console.error('Could not parse JSON from lint output -----');
+          console.error(stdout.toString());
+          console.error('-----');
           console.error(parseErr);
+          console.error('Could not parse JSON from lint output');
         }
       }
 
