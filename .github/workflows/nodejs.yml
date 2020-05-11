@@ -24,12 +24,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: npm install
+        run: yarn install
       - name: Static analysis
-        run: npm run lint
+        run: yarn lint
       - name: Build
-        run: npm run build
+        run: yarn build
       - name: Run integration tests
         uses: GabrielBB/xvfb-action@v1.0
         with:
-          run: npm test
+          run: yarn test
