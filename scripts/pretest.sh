@@ -6,6 +6,6 @@
 # and adjust timeouts and so on.
 echo "Installing dependencies in sample project"
 cd ./test-fixtures/sample-project
-yarn install
+npm install
 
 cd ../..
