@@ -15,7 +15,7 @@ const DELAY_BEFORE_LINT_MS = 0.5 * 1000;
 
 // If the lint operation doesn't complete quickly, cancel it.
 // We don't want to degrade the editor experience.
-const LINT_TIMEOUT_MS = 2 * 1000;
+const LINT_TIMEOUT_MS = 1 * 1000;
 
 let lintTimeoutId: NodeJS.Timeout | null = null;
 
