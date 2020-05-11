@@ -26,9 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Static analysis
-        run: npm lint
+        run: npm run lint
       - name: Build
-        run: npm build
+        run: npm run build
       - name: Run integration tests
         uses: GabrielBB/xvfb-action@v1.0
         with:
