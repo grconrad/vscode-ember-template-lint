@@ -36,7 +36,6 @@
     "workspaceContains:.template-lintrc.js"
   ],
   "dependencies": {
-    "execa": "^4.0.0",
     "find-up": "^4.1.0"
   },
   "devDependencies": {
