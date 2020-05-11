@@ -176,7 +176,9 @@ function lintTemplate(
         // and we have to strip out that part before attempting to parse the JSON.
         if (process.env.CI === 'true') {
           const testRunnerErrorFragmentIdx = output.indexOf('##[error]');
-          output = output.substring(0, testRunnerErrorFragmentIdx);
+          if (testRunnerErrorFragmentIdx !== -1) {
+            output = output.substring(0, testRunnerErrorFragmentIdx);
+          }
         }
 
         try {

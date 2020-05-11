@@ -30,6 +30,6 @@ jobs:
       - name: Build
         run: yarn build
       - name: Run integration tests
-        uses: GabrielBB/xvfb-action@v1.2
+        uses: GabrielBB/xvfb-action@v1.0
         with:
           run: yarn test
