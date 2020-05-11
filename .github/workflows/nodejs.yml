@@ -33,10 +33,12 @@ jobs:
         working-directory: ./test-fixtures/sample-project
         run: |
           yarn install
+          set +e
           echo "Piping a string to stdin:"
           cat foo/rule-violation.hbs | node_modules/.bin/ember-template-lint --json --filename foo/rule-violation.hbs
           echo "Direct file input:"
           node_modules/.bin/ember-template-lint --json foo/rule-violation.hbs
+          set -e
           echo "Done with test commands"
         shell: sh {0}
       - name: Run integration tests
