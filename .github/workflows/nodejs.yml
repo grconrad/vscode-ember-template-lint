@@ -34,6 +34,7 @@ jobs:
           yarn pretest
           cd test-fixtures/sample-project
           cat foo/rule-violation.hbs | node_modules/.bin/ember-template-lint --json --filename foo/rule-violation.hbs
+          echo "RGC"
       - name: Run integration tests
         uses: GabrielBB/xvfb-action@v1.2
         with:
