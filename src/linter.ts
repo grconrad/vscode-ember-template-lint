@@ -165,8 +165,10 @@ async function lintTemplate(
       if (status !== 0) {
         try {
           // We hope the output is valid JSON so we can parse it.
-          // If it isn't, that's probably a bug in ember-template-lint since we asked for json.
+          // If it isn't, it could be a bug in ember-template-lint since we asked for json.
+          // Or, it could be that the GitHub Actions test runner
           const json = stdout.toString(); // we hope it's valid json
+
           const jsonResult = JSON.parse(json);
 
           // Fish out the errors.
@@ -174,6 +176,7 @@ async function lintTemplate(
 
           console.log(`Linter reported ${lintIssues.length} issues`);
         } catch (parseErr) {
+          console.log(process.env);
           console.error('Could not parse JSON from lint output');
           console.error(result);
           console.error(parseErr);
