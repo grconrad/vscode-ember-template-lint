@@ -35,10 +35,9 @@ jobs:
           cat foo/rule-violation.hbs | node_modules/.bin/ember-template-lint --json --filename foo/rule-violation.hbs
           echo "RGC"
         working-directory: ./test-fixtures/sample-project
-        shell: bash
+        shell: sh {0}
       - name: Run integration tests
         uses: GabrielBB/xvfb-action@v1.2
         with:
+          shell: sh {0}
           run: yarn test
-        env:
-          CI: false
