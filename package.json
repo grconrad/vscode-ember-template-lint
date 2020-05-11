@@ -27,7 +27,7 @@
     "clean": "rm -rf out",
     "lint": "eslint src --ext ts",
     "pretest": "./scripts/pretest.sh",
-    "test": "node ./out/test/runTest.js",
+    "test": "./scripts/pretest.sh && node ./out/test/runTest.js",
     "vscode:prepublish": "yarn build",
     "vsix": "vsce package",
     "watch": "tsc -watch -p ./"
@@ -36,7 +36,6 @@
     "workspaceContains:.template-lintrc.js"
   ],
   "dependencies": {
-    "execa": "^4.0.0",
     "find-up": "^4.1.0"
   },
   "devDependencies": {

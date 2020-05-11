@@ -1,9 +1,13 @@
 # (Unofficial) Ember template lint for VS Code
 
-See ember-template-lint errors in your Problems view and editor as you work with `.hbs` files in your Ember project.
+See ember-template-lint errors in your Problems view as you edit `.hbs` files in your Ember project.
+
+In your editor view, each error should show a red squiggly.
 
 ## Requirements
 
-Your Ember project needs to already use ember-template-lint as a dependency. It needs to be in node_modules.
+Your Ember project must:
 
-You also need a `.template-lintrc.js` file in your project root. Without that, this extension will not activate.
+- Use ember-template-lint@^2.3.0 as a dependency (with it installed in node_modules).
+- Have a `.template-lintrc.js` file in your project root (same directory as package.json and node_modules).
+Without it, this extension will not activate.
